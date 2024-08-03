@@ -3,7 +3,7 @@ vim.diagnostic.config {
 }
 
 -- Remove transparency
-vim.opt.pumblend = 0
+-- vim.opt.pumblend = 0
 
 -- Change color of floating borders
 vim.api.nvim_set_hl(0, 'FloatBorder', { link = 'TelescopeBorder' })

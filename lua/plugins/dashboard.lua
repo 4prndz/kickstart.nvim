@@ -1,38 +1,60 @@
 return {
   'nvimdev/dashboard-nvim',
-  lazy = false, -- As https://github.com/nvimdev/dashboard-nvim/pull/450, dashboard-nvim shouldn't be lazy-loaded to properly handle stdin.
-  opts = {
-    config = {
-      header = vim.split(string.rep('\n', 10), '\n'),
-      center = {
-        {
-          action = 'lua LazyVim.pick()()',
-          desc = ' Find File',
-          icon = ' ',
-          key = 'f',
-          icon_hl = 'AccessQual',
-          key_hl = 'AerialGuide',
-        },
-        {
-          action = 'lua LazyVim.pick.config_files()()',
-          desc = ' Config',
-          icon = ' ',
-          key = 'c',
-          icon_hl = 'AccessQual',
-          key_hl = 'AerialGuide',
-        },
-        {
-          action = function()
-            vim.api.nvim_input '<cmd>qa<cr>'
-          end,
-          desc = ' Quit',
-          icon = '󰩈 ',
-          icon_hl = 'AccessQual',
-          key = 'q',
-          key_hl = 'AerialGuide',
-        },
+  event = 'VimEnter',
+  opts = function()
+    local logo = [[
+
+
+
+    ▐ ▄ ▄▄▄ .       ▌ ▐·▪  • ▌ ▄ ·.
+    •█▌▐█▀▄.▀·▪     ▪█·█▌██ ·██ ▐███▪
+    ▐█▐▐▌▐▀▀▪▄ ▄█▀▄ ▐█▐█•▐█·▐█ ▌▐▌▐█·
+    ██▐█▌▐█▄▄▌▐█▌.▐▌ ███ ▐█▌██ ██▌▐█▌
+    ▀▀ █▪ ▀▀▀  ▀█▄▀▪. ▀  ▀▀▀▀▀  █▪▀▀▀
+
+      ]]
+
+    local opts = {
+      theme = 'doom',
+      hide = {
+        statusline = false,
       },
-      footer = {},
-    },
-  },
+      config = {
+        header = vim.split(logo, '\n'),
+        center = {
+          { action = 'Telescope find_files', desc = ' Find file', icon = ' ', key = 'f' },
+          -- { action = 'ene | startinsert', desc = ' New file', icon = ' ', key = 'n' },
+          { action = 'Telescope oldfiles', desc = ' Recent files', icon = ' ', key = 'r' },
+          { action = 'Telescope live_grep', desc = ' Find text', icon = ' ', key = 'g' },
+          { action = 'e $MYVIMRC', desc = ' Config', icon = ' ', key = 'c' },
+          -- { action = 'lua require("persistence").load()', desc = ' Restore Session', icon = ' ', key = 's' },
+          { action = 'Lazy', desc = ' Lazy', icon = '󰒲 ', key = 'l' },
+          { action = 'qa', desc = ' Quit', icon = ' ', key = 'q' },
+        },
+        footer = {},
+        -- footer = function()
+        -- local stats = require('lazy').stats()
+        -- local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+        -- return { '⚡ Neovim loaded ' .. stats.loaded .. '/' .. stats.count .. ' plugins in ' .. ms .. 'ms' }
+        -- end,
+      },
+    }
+
+    for _, button in ipairs(opts.config.center) do
+      button.desc = button.desc .. string.rep(' ', 43 - #button.desc)
+    end
+
+    -- close Lazy and re-open when the dashboard is ready
+    if vim.o.filetype == 'lazy' then
+      vim.cmd.close()
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'DashboardLoaded',
+        callback = function()
+          require('lazy').show()
+        end,
+      })
+    end
+
+    return opts
+  end,
 }

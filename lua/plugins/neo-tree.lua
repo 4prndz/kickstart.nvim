@@ -31,6 +31,7 @@ return {
       require('nvim-tree').setup {
         view = {
           width = 35,
+          side = 'right',
         },
         on_attach = my_on_attach,
         filters = {
